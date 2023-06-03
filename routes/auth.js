@@ -4,6 +4,9 @@ const MySql = require("../routes/utils/MySql");
 const DButils = require("../routes/utils/DButils");
 const bcrypt = require("bcrypt");
 
+/**
+ * This path register a new user, checks that the username is not taken and hash the password
+ */
 router.post("/Register", async (req, res, next) => {
   try {
     // parameters exists
@@ -16,7 +19,6 @@ router.post("/Register", async (req, res, next) => {
       country: req.body.country,
       password: req.body.password,
       email: req.body.email,
-      profilePic: req.body.profilePic
     }
     let users = [];
     users = await DButils.execQuery("SELECT username from users");
@@ -29,8 +31,9 @@ router.post("/Register", async (req, res, next) => {
       user_details.password,
       parseInt(process.env.bcrypt_saltRounds)
     );
+    let user_id = 0;
     await DButils.execQuery(
-      `INSERT INTO users VALUES ('${user_details.username}', '${user_details.firstname}', '${user_details.lastname}',
+      `INSERT INTO users VALUES ('${user_id}','${user_details.username}','${user_details.firstname}', '${user_details.lastname}',
       '${user_details.country}', '${hash_password}', '${user_details.email}')`
     );
     res.status(201).send({ message: "user created", success: true });
@@ -38,14 +41,17 @@ router.post("/Register", async (req, res, next) => {
     next(error);
   }
 });
-
+/**
+ * This path check if the username and password are correct and save the user id as the current user.
+ */
 router.post("/Login", async (req, res, next) => {
   try {
     // check that username exists
     const users = await DButils.execQuery("SELECT username FROM users");
-    if (!users.find((x) => x.username === req.body.username))
-      throw { status: 401, message: "Username or Password incorrect" };
+    if (!users.find((x) => x.username === req.body.username)){
 
+      throw { status: 401, message: "Username 1or Password incorrect" };
+    }
     // check that the password is correct
     const user = (
       await DButils.execQuery(
@@ -54,7 +60,7 @@ router.post("/Login", async (req, res, next) => {
     )[0];
 
     if (!bcrypt.compareSync(req.body.password, user.password)) {
-      throw { status: 401, message: "Username or Password incorrect" };
+      throw { status: 401, message: "Username or 2Password incorrect" };
     }
 
     // Set cookie
@@ -67,7 +73,9 @@ router.post("/Login", async (req, res, next) => {
     next(error);
   }
 });
-
+/**
+ * This path logout the user by reseting the session.
+ */
 router.post("/Logout", function (req, res) {
   req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
   res.send({ success: true, message: "logout succeeded" });
