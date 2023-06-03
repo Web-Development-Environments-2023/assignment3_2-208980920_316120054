@@ -19,7 +19,7 @@ async function searchRecipes(query,diet,cuisine,intolerances) {
     return await axios.get(`${api_domain}/complexSearch`, {
         params: {
             query: query,
-            number: 1, //  in client side will decide if it is 5/10/15 recipes according to his choice
+            number: 15, //  in client side will decide if it is 5/10/15 recipes according to his choice
             cuisine:cuisine,
             diet:diet,
             intolerances:intolerances,
