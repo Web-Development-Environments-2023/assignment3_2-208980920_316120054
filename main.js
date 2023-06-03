@@ -5,10 +5,12 @@ var path = require("path");
 var logger = require("morgan");
 const session = require("client-sessions");
 const DButils = require("./routes/utils/DButils");
+const cookieParser = require("cookie-parser");
 var cors = require('cors')
 
 var app = express();
 app.use(logger("dev")); //logger
+app.use(cookieParser());
 app.use(express.json()); // parse application/json
 app.use(
   session({
