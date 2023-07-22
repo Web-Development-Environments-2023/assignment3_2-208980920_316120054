@@ -29,6 +29,10 @@ async function add_to_viewed(user_id, recipe_id) {
     if (existingRecord.length === 0) {
         await DButils.execQuery(`INSERT INTO viewed_recipes VALUES (${recipe_id},${user_id},default)`);
     }
+    else{
+        await DButils.execQuery(`Update viewed_recipes SET date=NOW() WHERE recipeId=${recipe_id} AND user_id = ${user_id}`)
+
+    }
   }
     catch(error){
         console.log("error in add_to_viewed");
@@ -47,7 +51,8 @@ async function get_last_viewed(user_id){
  *  Returns the family recipes of the logged-in user
  */
 async function family_recipes(user_id){
-    const familyRecipes = await DButils.execQuery(`select owner,appointed_time,appointed_time,ingredients,instructions from family_recipes where user_id='${user_id}'`);
+    const familyRecipes = await DButils.execQuery(`select * from family_recipes where user_id='${user_id}'`);
+
     return familyRecipes;
 }
 

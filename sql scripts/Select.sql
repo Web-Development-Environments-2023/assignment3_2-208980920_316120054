@@ -1,1 +1,2 @@
-SELECT * FROM mydb.users;
+ALTER TABLE viewed_recipes
+ADD date  DATETIME DEFAULT CURRENT_TIMESTAMP;

@@ -6,9 +6,9 @@ const config={
 connectionLimit:4,
   host: process.env.host,//"localhost"
   user: process.env.user,//"root"
-  password:"rHas9697!",
-  // password: "pass_root@123",
-  database: "project-web",
+  // password:"rHas9697!",
+  password: "pass_root@123",
+  database: "projectweb",
   // database:"mydb"
 }
 const pool = new mysql.createPool(config);

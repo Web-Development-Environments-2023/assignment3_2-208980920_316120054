@@ -126,6 +126,7 @@ router.get("/get_last_viewed", async (req, res, next) => {
       }
       results.push(recipe);
     }
+    
     res.status(200).send(results);
   }
   catch (error) {
@@ -154,7 +155,16 @@ router.get("/get_family_recipes", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
     const familyRecipes = await user_utils.family_recipes(user_id);
-    res.status(200).send(familyRecipes);
+    
+    let unit_recipes = [];
+    for(const recipe of familyRecipes){
+      let r = await recipe_utils.getRecipeDetails(recipe.recipeId,user_id);
+      r.owner = recipe.owner;
+      r.appointed_time = recipe.appointed_time;
+      unit_recipes.push(r);
+    }
+    
+    res.status(200).send(unit_recipes);
   } catch (error) {
     next(error);
   }
@@ -167,31 +177,15 @@ router.get("/MyRecipes", async (req, res, next) => {
     const user_id = req.session.user_id;
     const recipes = await DButils.execQuery(
       `SELECT * FROM recipes WHERE user_id = ${user_id}`
-    );
-    const favorite_recipes = await user_utils.getFavoriteRecipes(user_id);
+    ); 
     
-    for (let i=0;i< recipes.length;i++) {
-      if(favorite_recipes.find((element) => element.recipeId === recipes[i].recipeId)){
-        recipes[i].favorite = true;
-      }
-      else{
-        recipes[i].favorite = false;
-      }
-    }
-    const viewed_recipes = await user_utils.getViewedRecipes(user_id);
-    for (let i=0;i< recipes.length;i++) {
-      if(viewed_recipes.find((element) => element.recipeId === recipes[i].recipeId)){
-        recipes[i].viewed = true;
-      }
-      else{
-        recipes[i].viewed = false;
-      }
+    let fullRecipes = [];
+    for(const recipe of recipes ){
+      fullRecipes.push(await recipe_utils.getRecipeDetails(recipe.recipeId,user_id));
     }
 
-
-    
-
-    res.status(200).send(recipes);
+    console.log("My recipes: ",fullRecipes)
+    res.status(200).send(fullRecipes);
   } catch (error) {
     next(error);
   }

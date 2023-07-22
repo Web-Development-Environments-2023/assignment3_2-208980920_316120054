@@ -90,10 +90,11 @@ router.get("/search", async (req, res, next) => {
  */
 router.get("/:recipeId", async (req, res, next) => {
   try {
-
+    console.log("req.params is: ",req.params)
     const id = req.params.recipeId 
     const user_id = req.session.user_id;
     const recipe = await recipes_utils.getRecipeDetails(id,user_id);
+  
     res.send(recipe).status(200);
     
   } catch (error) {

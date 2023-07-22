@@ -70,11 +70,16 @@ async function getRecipesPreview(recipe_id,user_id) {
     
     try{
         let recipe_info = await getRecipeInformation(recipe_id);
-        let title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree;
+        
+        let title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree,popularity,gluten_free;
         if (recipe_info.data) {
           ({ title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data);
         } else {
-          ({ title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info);
+            
+          ({ title, readyInMinutes, image, popularity, vegan, vegetarian, gluten_free } = recipe_info);
+        }
+        if(glutenFree===undefined){
+            glutenFree=gluten_free;
         }
         let existbool;
         let favorite_bool;
@@ -105,7 +110,7 @@ async function getRecipesPreview(recipe_id,user_id) {
             title: title,
             readyInMinutes: readyInMinutes,
             image: image,
-            popularity: aggregateLikes,
+            popularity: aggregateLikes|| popularity,
             vegan: vegan,
             vegetarian: vegetarian,
             glutenFree: glutenFree,
@@ -124,8 +129,9 @@ async function getRecipeDetails(recipe_id,user_id) {
 
         let recipe_info = await getRecipeInformation(recipe_id);
         if (recipe_info.data===undefined){
+            console.log("after",recipe_info)
             try{
-            let {  recipeId, user_id, title, instruction ,popularity, portion ,readyInMinutes, ingredients, vegan, gluten_free, image, vegetarian } = recipe_info[0];
+            let {  recipeId, user_id, title, instruction ,popularity, portion ,readyInMinutes, ingredients, vegan, gluten_free, image, vegetarian } = recipe_info;
             let existbool;
             let favorite_bool;
             if (user_id == undefined){
@@ -299,6 +305,7 @@ async function getMyRecipesDetails(recipe_id) {
       );
         
         if (recipe.length !== 0) {
+            console.log("recipe details in my recipe detailes: ", recipe);
             return recipe[0];
           }
           else{
