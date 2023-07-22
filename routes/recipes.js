@@ -13,6 +13,7 @@ router.get("/", (req, res) => res.send("I'm here"));
 
 router.get("/Random", async (req, res, next) => {
   try {
+
     let recipes = await recipes_utils.getRecipeRandom();
     let user_id = req.session.user_id;
     recipes = recipes.data.recipes;
@@ -21,11 +22,13 @@ router.get("/Random", async (req, res, next) => {
         id: recipe.id,
       };
     });
+
     let recipes_ans = [];
     for(const recipe of recipes_ids){
       const rec = await recipes_utils.getRecipesPreview(recipe.id, user_id);
       recipes_ans.push(rec);
     }
+
     res.status(200).send(recipes_ans);
     
   } catch (error) {
@@ -56,14 +59,15 @@ router.get("/last-search", (req, res) => {
  */
 router.get("/search", async (req, res, next) => {
   try { 
-    const query = req.body.query;
-    const diet = req.body.diet;
-    const cuisine = req.body.cuisine;
-    const intolerances = req.body.intolerances;
-   
+    
+    const query = req.query.query;
+    const diet = req.query.diet;
+    const cuisine = req.query.cuisine;
+    const intolerances = req.query.intolerances;
+    const numberofrecipes = req.query.numberofresults;
     // Update the list of last searches
-    recipes_utils.updateLastSearches(query, res);
-    let recipes = await recipes_utils.searchRecipes(query, diet, cuisine, intolerances);
+    recipes_utils.updateLastSearches(query, diet,cuisine,intolerances,numberofrecipes, res);
+    let recipes = await recipes_utils.searchRecipes(query, diet, cuisine, intolerances,numberofrecipes);
     recipes = recipes.data.results;
     const user_id = req.session.user_id;
     const recipes_ids = recipes.map((recipe) => {
@@ -86,10 +90,11 @@ router.get("/search", async (req, res, next) => {
  */
 router.get("/:recipeId", async (req, res, next) => {
   try {
+
     const id = req.params.recipeId 
     const user_id = req.session.user_id;
     const recipe = await recipes_utils.getRecipeDetails(id,user_id);
-    res.send(recipe);
+    res.send(recipe).status(200);
     
   } catch (error) {
     next(error);

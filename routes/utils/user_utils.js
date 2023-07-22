@@ -14,13 +14,27 @@ async function getFavoriteRecipes(user_id){
     const recipes_id = await DButils.execQuery(`select recipeId from FavoriteRecipes where user_id='${user_id}'`);
     return recipes_id;
 }
+
+async function getViewedRecipes(user_id){
+    const recipes_id = await DButils.execQuery(`select recipeId from viewed_recipes where user_id='${user_id}'`);
+    return recipes_id;
+}
 /**
  * Adds the recipe to the viewed recipes table in the DB
  */
-async function add_to_viewed(user_id, recipe_id){
-
-    await DButils.execQuery(`insert into viewed_recipes values (${recipe_id},${user_id},DEFAULT)`);
+async function add_to_viewed(user_id, recipe_id) {
+    const query = `SELECT * FROM viewed_recipes WHERE recipeId=${recipe_id} AND user_id = ${user_id}`;
+    try{
+    const existingRecord = await DButils.execQuery(query);
+    if (existingRecord.length === 0) {
+        await DButils.execQuery(`INSERT INTO viewed_recipes VALUES (${recipe_id},${user_id},default)`);
+    }
+  }
+    catch(error){
+        console.log("error in add_to_viewed");
+    }
 }
+  
 /**
  * 
     * Returns the last 3 recipes that were saved as last viewed of the logged-in user
@@ -43,3 +57,4 @@ exports.getFavoriteRecipes = getFavoriteRecipes;
 exports.add_to_viewed = add_to_viewed;
 exports.get_last_viewed = get_last_viewed;
 exports.family_recipes = family_recipes;
+exports.getViewedRecipes = getViewedRecipes;
